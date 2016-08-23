@@ -3,19 +3,16 @@ module Dynamic exposing (..)
 
 import Html exposing (Html, div, text)
 import Html.App as App
---import CommandImpl
+import CommandImpl
 
 
-type Msg = NoOp
+type Msg = CommandImplMsg CommandImpl.Msg
 
 
-type alias Model a =
+type alias Model =
     { mod  : String
-    , impl : Impl a
+    , data : CommandImpl.Model
     }
-
-
-type Impl a = Impl    
 
 
 main =
@@ -27,16 +24,18 @@ main =
     }
 
 
-init : (Model a, Cmd Msg)
+init : (Model, Cmd Msg)
 init =
-  (Model "ApplicationCreated" Impl, Cmd.none)
+  (Model "ApplicationCreated" (CommandImpl.init "SendText"), Cmd.none)
 
 
-view : Model a -> Html Msg
+view : Model -> Html Msg
 view model =
-  div [] [ ]
+  div [] [ App.map CommandImplMsg (CommandImpl.view model.data) ]
 
 
-update : Msg -> Model a -> (Model a, Cmd Msg)
-update msg model =
-  (model, Cmd.none)
+update : Msg -> Model -> (Model, Cmd Msg)
+update message model =
+  case message of
+    CommandImplMsg msg ->
+      ({ model | data = CommandImpl.update msg model.data }, Cmd.none)
