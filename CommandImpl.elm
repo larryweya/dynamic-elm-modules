@@ -50,24 +50,10 @@ view model =
 
 update : Msg -> Model -> Model          
 update message model =
-  case message of
-    CreateInvoiceMsg msg ->
-      { model | impl = CreateInvoiceImpl (updateCreateInvoice msg model.impl) }
-    SendTextMsg msg ->
-      { model | impl = SendTextImpl (updateSendText msg model.impl) }
-
-
-updateCreateInvoice msg data =
-  case data of
-    CreateInvoiceImpl data ->
-      CreateInvoice.update msg data
+  case (message, model.impl) of
+    (CreateInvoiceMsg msg, CreateInvoiceImpl data) ->
+      { model | impl = CreateInvoiceImpl (CreateInvoice.update msg data) }
+    (SendTextMsg msg, SendTextImpl data) ->
+      { model | impl = SendTextImpl (SendText.update msg data) }
     _ ->
-      Debug.crash "invalid impl for create invoice update"
-
-
-updateSendText msg data =
-  case data of
-    SendTextImpl data ->
-      SendText.update msg data
-    _ ->
-      Debug.crash "invalid impl for send text update"          
+      model
